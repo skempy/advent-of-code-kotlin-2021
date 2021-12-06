@@ -20,7 +20,6 @@ fun main() {
     fun part2(input: List<String>): Long {
         val ocean = input[0].split(",").map { it.toLong() }.groupingBy { it }.eachCount().mapValues { it.value.toLong() }.toMutableMap()
 
-        // (age , quantity)
         for (i in 0..8) {
             if (!ocean.containsKey(i.toLong())) {
                 ocean[i.toLong()] = 0L
@@ -52,7 +51,6 @@ fun main() {
     val input = readInput("Day06")
     println(part1(input))
     println(part2(input))
-    println("Is this fucked")
     check(part1(input) == 360610)
     check(part2(input) == 0L)
 }
@@ -73,17 +71,5 @@ data class Ocean(var fish: MutableList<Fish>) {
 data class Fish(var age: Int) {
     fun age() {
         if (age == 0) age = 6 else age -= 1
-    }
-}
-
-data class NewFish(var age: Long, var quantity: Long) {
-    fun incrementDay() {
-        if (age == 0L) {
-            age = 6L
-            quantity = quantity
-        } else {
-            age -= 1L
-        }
-
     }
 }
