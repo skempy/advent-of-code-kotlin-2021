@@ -9,6 +9,8 @@ fun readInput(name: String, test: String = "") = File("src/${name.lowercase()}",
 
 fun readInputAsInt(name: String, test: String = "") = File("src/${name.lowercase()}", "$name$test.txt").readLines().map { it.toInt() }
 
+fun readInputAsIntList(name: String, test: String = "") = File("src/${name.lowercase()}", "$name$test.txt").readLines()[0].split(",").map { it.toInt() }
+
 /**
  * Converts string to md5 hash.
  */

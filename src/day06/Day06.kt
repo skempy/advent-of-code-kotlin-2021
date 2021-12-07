@@ -29,11 +29,14 @@ fun main() {
         for (i in 1..256) {
             val rebornFishes = ocean[0L]
             ocean.toSortedMap().forEach { (key, values) ->
-                if (key == 0L) {
-                    ocean[9L] = values
-                    ocean[0L] = ocean[1L]!!.toLong()
-                } else if (key <= 8) {
-                    ocean[key] = ocean[key + 1L]!!.toLong()
+                when {
+                    key == 0L -> {
+                        ocean[9L] = values
+                        ocean[0L] = ocean[1L]!!.toLong()
+                    }
+                    key <= 8 -> {
+                        ocean[key] = ocean[key + 1L]!!.toLong()
+                    }
                 }
             }
             ocean[6] = ocean[6]!!.plus(rebornFishes!!.toLong())
