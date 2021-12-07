@@ -4,6 +4,16 @@ import readInputAsIntList
 
 fun main() {
 
+    fun calculateCrabFuel(it: Map.Entry<Int, Int>, i: Int) = i * it.value
+
+    fun calculateNewCrabFuel(it: Map.Entry<Int, Int>, i: Int): Int {
+        var newFuelCost = 0
+        (0..i).forEach { step ->
+            newFuelCost += step
+        }
+        return newFuelCost * it.value
+    }
+
     fun part1(input: List<Int>): Int {
         val groupedCrabs = input.groupingBy { it }.eachCount().mapValues { it.value }.toMutableMap()
         val highestPosition = groupedCrabs.keys.maxOrNull() ?: 0
@@ -12,12 +22,11 @@ fun main() {
         val fuelCosts = mutableMapOf<Int, Int>()
 
         (lowestPosition..highestPosition).forEach { matchPosition ->
-            //println("List of Crabs: $groupedCrabs at position: $matchPosition")
             var fuel = 0
             groupedCrabs.forEach {
                 when {
-                    it.key > matchPosition -> fuel += (it.key - matchPosition) * it.value
-                    it.key < matchPosition -> fuel += (matchPosition - it.key) * it.value
+                    it.key > matchPosition -> fuel += calculateCrabFuel(it, (it.key - matchPosition))
+                    it.key < matchPosition -> fuel += calculateCrabFuel(it, matchPosition - it.key)
                 }
             }
             fuelCosts[matchPosition] = fuel
@@ -37,22 +46,8 @@ fun main() {
             var fuel = 0
             groupedCrabs.forEach {
                 when {
-                    it.key > matchPosition -> {
-                        fuel += run {
-                            var newFuelCost = 0
-                            (0..it.key - matchPosition).forEach { step ->
-                                newFuelCost += step
-                            }
-                            newFuelCost
-                        } * it.value
-                    }
-                    it.key < matchPosition -> fuel += run {
-                        var newFuelCost = 0
-                        (0..matchPosition - it.key).forEach { step ->
-                            newFuelCost += step
-                        }
-                        newFuelCost
-                    } * it.value
+                    it.key > matchPosition -> fuel += calculateNewCrabFuel(it, it.key - matchPosition)
+                    it.key < matchPosition -> fuel += calculateNewCrabFuel(it, matchPosition - it.key)
                 }
             }
             fuelCosts[matchPosition] = fuel
