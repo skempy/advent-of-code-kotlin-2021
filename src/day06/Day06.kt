@@ -4,17 +4,12 @@ import readInput
 
 fun main() {
 
-    fun calculateFishFor(input: List<String>, days: Int): Ocean {
-        val ocean = Ocean(input[0].split(",").map { Fish(it.toInt()) }.toMutableList())
-        for (i in 1..days) {
-            ocean.day()
-        }
-        return ocean
-    }
-
     fun part1(input: List<String>): Int {
-        val ocean = calculateFishFor(input, 80)
-        return ocean.fish.size
+        val ocean1 = Ocean(input[0].split(",").map { Fish(it.toInt()) }.toMutableList())
+        for (i in 1..80) {
+            ocean1.day()
+        }
+        return ocean1.fish.size
     }
 
     fun part2(input: List<String>): Long {

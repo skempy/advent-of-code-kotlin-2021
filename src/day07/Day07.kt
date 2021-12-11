@@ -1,5 +1,6 @@
 package day07
 
+import java.lang.Math.abs
 import readInputAsIntList
 
 fun main() {
