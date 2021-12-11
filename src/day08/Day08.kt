@@ -25,9 +25,8 @@ fun main() {
                 8 to part1.first { it.length == 7 }
             )
 
-            println(knownSegments)
-
             val unknownSegments = part1.filter { !knownSegments.values.contains(it) }
+
             val fiveTwoThree = unknownSegments.filter { it.length == 5 }
 
             val a = knownSegments[7]!!.filter { !knownSegments[1]!!.contains(it) }
@@ -39,18 +38,10 @@ fun main() {
             val g = fiveTwoThree.first { it.contains(e) }.filter { !(a + b + d + e).contains(it) }
             val f = fg.filter { !(g).contains(it) }
 
-            println("a: $a")
-            println("b: $b")
-            println("c: $c")
-            println("d: $d")
-            println("e: $e")
-            println("g: $g")
-            println("f: $f")
-
             val numbers = mapOf(
                 0 to (a + b + c + d + e + f).toCharArray().sorted(),
                 1 to (b + c).toCharArray().sorted(),
-                2 to (a + b + d + e + f).toCharArray().sorted(),
+                2 to (a + b + d + e + g).toCharArray().sorted(),
                 3 to (a + b + c + d + g).toCharArray().sorted(),
                 4 to (b + c + f + g).toCharArray().sorted(),
                 5 to (a + c + d + f + g).toCharArray().sorted(),
@@ -59,37 +50,30 @@ fun main() {
                 8 to (a + b + c + d + e + f + g).toCharArray().sorted(),
                 9 to (a + b + c + d + f + g).toCharArray().sorted()
             )
-            println(numbers)
-            println(part2)
-
-            val lol = part2.stream().map { segment ->
-                println(segment)
-                numbers.entries.first {
-                    println(it.value)
-                    it.value == segment.toCharArray().sorted()
-                }.key.toString()
-            }.toList()
 
             var value = ""
-            lol.forEach {
+            part2.stream().map { segment ->
+                numbers.entries.first { it.value == segment.toCharArray().sorted() }.key.toString()
+            }.toList().forEach {
                 value += it
             }
             listOfTotal.add(value.toInt())
         }
+
         return listOfTotal.sum()
     }
 
 // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day08", "_test")
-//    println(part1(testInput))
-//    check(part1(testInput) == 26)
-//    println(part2(testInput))
-//    check(part2(testInput) == 0)
-//
+    println(part1(testInput))
+    check(part1(testInput) == 26)
+    println(part2(testInput))
+    check(part2(testInput) == 61229)
+
     val input = readInput("Day08")
-//    println(part1(input))
+    println(part1(input))
+    check(part1(input) == 488)
     println(part2(input))
-//    check(part1(input) == 0)
-//    check(part2(input) == 0)
+    check(part2(input) == 1040429)
 }
 
