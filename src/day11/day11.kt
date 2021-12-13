@@ -8,28 +8,29 @@ fun main() {
 
     var octopusGrid = mutableMapOf<Point, Int>()
     var flashedOctopus = mutableSetOf<Point>()
-    var potentialOctopus = mutableSetOf<Point>()
+    var flashes = 0
 
-    fun increaseEnergy(it: Point) {
+    fun increaseEnergy(it: Point): Point {
         if (octopusGrid.contains(it)) {
             octopusGrid[it] = octopusGrid[it]!! + 1
             if (octopusGrid[it]!! > 9 && !flashedOctopus.contains(it)) {
-                potentialOctopus.add(it)
+                flashes += 1
+                return it
             }
         }
+        return Point()
     }
 
     fun flash(it: Point) {
-        Point(it.x, it.y - 1).also { increaseEnergy(it) } //above
-        Point(it.x, it.y + 1).also { increaseEnergy(it) } //below
-        Point(it.x - 1, it.y).also { increaseEnergy(it) } //left
-        Point(it.x + 1, it.y).also { increaseEnergy(it) } //right
-        Point(it.x + 1, it.y - 1).also { increaseEnergy(it) } //topRight
-        Point(it.x - 1, it.y - 1).also { increaseEnergy(it) } //topLeft
-        Point(it.x + 1, it.y + 1).also { increaseEnergy(it) } //bottomRight
-        Point(it.x - 1, it.y + 1).also { increaseEnergy(it) } //bottomLeft
-
         flashedOctopus.add(it)
+        Point(it.x, it.y - 1).also { if (increaseEnergy(it) != Point()) flash(it) } //above
+        Point(it.x, it.y + 1).also { if (increaseEnergy(it) != Point()) flash(it) } //below
+        Point(it.x - 1, it.y).also { if (increaseEnergy(it) != Point()) flash(it) } //left
+        Point(it.x + 1, it.y).also { if (increaseEnergy(it) != Point()) flash(it) } //right
+        Point(it.x + 1, it.y - 1).also { if (increaseEnergy(it) != Point()) flash(it) } //topRight
+        Point(it.x - 1, it.y - 1).also { if (increaseEnergy(it) != Point()) flash(it) } //topLeft
+        Point(it.x + 1, it.y + 1).also { if (increaseEnergy(it) != Point()) flash(it) } //bottomRight
+        Point(it.x - 1, it.y + 1).also { if (increaseEnergy(it) != Point()) flash(it) } //bottomLeft
     }
 
     fun printGrid(octopusLength: Int, octopusDepth: Int) {
@@ -42,6 +43,7 @@ fun main() {
     }
 
     fun part1(input: List<String>): Int {
+        flashes = 0
         val octopusLength = input[0].length
         val octopusDepth = input.size
 
@@ -53,17 +55,16 @@ fun main() {
             }
         }
 
-        (0..1).forEach {
+        (1..100).forEach {
+
             octopusGrid.map {
                 octopusGrid[it.key] = it.value + 1
 
                 if (it.value > 9 && !flashedOctopus.contains(it.key)) {
-                    println("Flash at: ${it.key.x},${it.key.y}")
                     flash(it.key)
+                    flashes += 1
                 }
             }
-
-            potentialOctopus.subtract(flashedOctopus).forEach { flash(it) }
 
             octopusGrid.map {
                 if (flashedOctopus.contains(it.key)) {
@@ -73,9 +74,8 @@ fun main() {
             printGrid(octopusLength, octopusDepth)
             println()
             flashedOctopus.clear()
-            potentialOctopus.clear()
         }
-        return 0
+        return flashes
     }
 
     fun part2(input: List<String>): Int {
@@ -85,12 +85,12 @@ fun main() {
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day11", "_test")
     part1(testInput)
-//    check(part1(testInput) == 0)
+    check(part1(testInput) == 1656)
 //    println(part2(testInput))
 //    check(part2(testInput) == 0)
 
     val input = readInput("Day11")
-//    println(part1(input))
+    println(part1(input))
 //    println(part2(input))
 //    check(part1(input) == 0)
 //    check(part2(input) == 0)
@@ -102,19 +102,3 @@ data class DumbOctopus(var energy: Int, val position: Int) {
     }
 }
 
-//34543
-//40004
-//50005
-//40004
-//34543
-
-//
-//                println("(${it.key.x},${it.key.y}), Above at: ${it.key.x},${it.key.y - 1}")
-//                println("(${it.key.x},${it.key.y}),Below at: ${it.key.x},${it.key.y + 1}")
-//                println("(${it.key.x},${it.key.y}),Left at: ${it.key.x - 1},${it.key.y}")
-//                println("(${it.key.x},${it.key.y}),Right at: ${it.key.x + 1},${it.key.y}")
-//
-//                println("(${it.key.x},${it.key.y}),Top Right at: ${it.key.x + 1},${it.key.y - 1}")
-//                println("(${it.key.x},${it.key.y}),Top Left at: ${it.key.x - 1},${it.key.y - 1}")
-//                println("(${it.key.x},${it.key.y}),Bottom Right at: ${it.key.x + 1},${it.key.y + 1}")
-//                println("(${it.key.x},${it.key.y}),Bottom Left: ${it.key.x - 1},${it.key.y + 1}")
