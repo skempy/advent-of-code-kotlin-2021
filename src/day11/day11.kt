@@ -10,49 +10,33 @@ fun main() {
     var flashedOctopus = mutableSetOf<Point>()
     var potentialOctopus = mutableSetOf<Point>()
 
-    fun flash(it: Point) {
-        val above = Point(it.x, it.y - 1)
-        val below = Point(it.x, it.y + 1)
-        val left = Point(it.x - 1, it.y)
-        val right = Point(it.x + 1, it.y)
-        val topRight = Point(it.x + 1, it.y - 1)
-        val topLeft = Point(it.x - 1, it.y - 1)
-        val bottomRight = Point(it.x + 1, it.y + 1)
-        val bottomLeft = Point(it.x - 1, it.y + 1)
-
-        octopusGrid[above] = octopusGrid[above]!! + 1 //above
-        octopusGrid[below] = octopusGrid[below]!! + 1 //below
-        octopusGrid[left] = octopusGrid[left]!! + 1 //left
-        octopusGrid[right] = octopusGrid[right]!! + 1 //right
-
-        octopusGrid[topRight] = octopusGrid[topRight]!! + 1 //Top Right
-        octopusGrid[topLeft] = octopusGrid[topLeft]!! + 1 //Top Left
-        octopusGrid[bottomRight] = octopusGrid[bottomRight]!! + 1 //Bottom Right
-        octopusGrid[bottomLeft] = octopusGrid[bottomLeft]!! + 1 //Bottom Left
-
-        val updatedOctopussies = listOf(
-            Pair(octopusGrid[above], above),
-            Pair(octopusGrid[below], below),
-            Pair(octopusGrid[left], left),
-            Pair(octopusGrid[right], right),
-            Pair(octopusGrid[topRight], topRight),
-            Pair(octopusGrid[topLeft], topLeft),
-            Pair(octopusGrid[bottomRight], bottomRight),
-            Pair(octopusGrid[bottomLeft], bottomLeft)
-        ).filter { it.first!! > 9 }
-            .filter { !flashedOctopus.contains(it.second) }
-
-        updatedOctopussies.forEach {
-            potentialOctopus.add(it.second)
+    fun increaseEnergy(it: Point) {
+        if (octopusGrid.contains(it)) {
+            octopusGrid[it] = octopusGrid[it]!! + 1
+            if (octopusGrid[it]!! > 9 && !flashedOctopus.contains(it)) {
+                potentialOctopus.add(it)
+            }
         }
+    }
+
+    fun flash(it: Point) {
+        Point(it.x, it.y - 1).also { increaseEnergy(it) } //above
+        Point(it.x, it.y + 1).also { increaseEnergy(it) } //below
+        Point(it.x - 1, it.y).also { increaseEnergy(it) } //left
+        Point(it.x + 1, it.y).also { increaseEnergy(it) } //right
+        Point(it.x + 1, it.y - 1).also { increaseEnergy(it) } //topRight
+        Point(it.x - 1, it.y - 1).also { increaseEnergy(it) } //topLeft
+        Point(it.x + 1, it.y + 1).also { increaseEnergy(it) } //bottomRight
+        Point(it.x - 1, it.y + 1).also { increaseEnergy(it) } //bottomLeft
+
         flashedOctopus.add(it)
     }
 
     fun printGrid(octopusLength: Int, octopusDepth: Int) {
-        repeat((1 .. octopusDepth).count()) { row ->
+        (1..octopusDepth).forEach { row ->
             println()
-            repeat((1 .. octopusLength).count()) { column ->
-                print(octopusGrid[Point(column + 1, row + 1)])
+            (1..octopusLength).forEach { column ->
+                print(octopusGrid[Point(row, column)])
             }
         }
     }
@@ -86,7 +70,7 @@ fun main() {
                     octopusGrid[it.key] = 0
                 }
             }
-            printGrid(octopusLength,octopusDepth)
+            printGrid(octopusLength, octopusDepth)
             println()
             flashedOctopus.clear()
             potentialOctopus.clear()
