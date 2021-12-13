@@ -5,9 +5,19 @@ import readInput
 
 fun main() {
 
+
+    fun detectDoubleSmallCaves(route: String): Boolean {
+        val caves = route.split("-").filter { it.first().isLowerCase() }
+        val groupedSmallCaves = caves.groupingBy { it }.eachCount().filter { it.value > 1 }
+        if (groupedSmallCaves.isNotEmpty()) {
+            return false
+        }
+        return true
+    }
+
     fun findNextStep(unknownRoutes: List<String>, input: List<String>): List<String> {
         var completedRoutes = mutableListOf<String>()
-        val startPoint = input.filter { it.contains("start") }
+
         unknownRoutes.map { route ->
             val lastCave = route.last().toString()
             val routes = input
@@ -15,36 +25,34 @@ fun main() {
                 .filter { it.takeLast(3) != "end" }
                 .filter { it.contains(lastCave) }
                 .filter { it != route }
+                .filter { detectDoubleSmallCaves(route) }
                 .map { if (it.first().toString() != lastCave) it.reversed() else it }
                 .map { it.replace(lastCave, route) }
                 .toList()
-            val numberOfOpenRoutes = routes.stream().filter { !it.contains("end") }.toList().size
-            val pass2 = findNextStep(routes, input.filter { !it.contains("start") })
-            completedRoutes.addAll(pass2)
-        }
-        return completedRoutes
-    }
 
-    fun exploreCaves(unknownRoutes: List<String>, input: List<String>, smallCaves: List<String>): MutableList<List<String>> {
-        var completedRoutes = mutableListOf<List<String>>()
-        unknownRoutes.forEach { route ->
-            val lastCave = route.last().toString()
-            println(lastCave)
-            completedRoutes.add(listOf(route, lastCave))
+            val numberOfOpenRoutes = routes.stream().filter { !it.contains("end") }.toList().size
+
+            if (numberOfOpenRoutes == 0) {
+                completedRoutes.addAll(routes)
+            } else {
+                println(routes)
+                findNextStep(routes, input.filter { !it.contains("start") })
+            }
         }
         return completedRoutes
     }
 
     fun part1(input: List<String>): Int {
         val startingPoint = input.filter { it.contains("start") }
+        val unknownPaths = input.filter { !it.contains("start") }
         val left = input.stream().map { it.split("-")[0] }.toList().distinct()
         val right = input.stream().map { it.split("-")[1] }.toList().distinct()
         val allCaves = (left + right).distinct()
         val smallCaves = allCaves.filter { it !in listOf("start", "end") }.filter { it.first().isLowerCase() }
         val bigCaves = allCaves.filter { it !in listOf("start", "end") }.filter { it.first().isUpperCase() }
 
-        val routes = exploreCaves(startingPoint, input, smallCaves)
-        //val routes = findNextStep(startingPoint, input)
+        val routes = findNextStep(startingPoint, input)
+
         println(routes)
         return 0
     }
