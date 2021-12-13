@@ -71,34 +71,56 @@ fun main() {
                     octopusGrid[it.key] = 0
                 }
             }
-            printGrid(octopusLength, octopusDepth)
-            println()
+            //printGrid(octopusLength, octopusDepth)
+            //println()
             flashedOctopus.clear()
         }
         return flashes
     }
 
     fun part2(input: List<String>): Int {
-        return 0
+        var count = 0
+
+        val octopusList = input.map { it.toCharArray().toList().map { getNumericValue(it.code) } }
+
+        repeat((octopusList.indices).count()) { row ->
+            repeat((octopusList[row].indices).count()) { column ->
+                octopusGrid[Point(row + 1, column + 1)] = octopusList[row][column]
+            }
+        }
+
+        while (octopusGrid.values.sum() != 0) {
+            count++
+            octopusGrid.map {
+                octopusGrid[it.key] = it.value + 1
+
+                if (it.value > 9 && !flashedOctopus.contains(it.key)) {
+                    flash(it.key)
+                    flashes += 1
+                }
+            }
+
+            octopusGrid.map {
+                if (flashedOctopus.contains(it.key)) {
+                    octopusGrid[it.key] = 0
+                }
+            }
+            flashedOctopus.clear()
+        }
+        println(count)
+        return count
     }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day11", "_test")
     part1(testInput)
     check(part1(testInput) == 1656)
-//    println(part2(testInput))
-//    check(part2(testInput) == 0)
+    println(part2(testInput))
+    check(part2(testInput) == 195)
 
     val input = readInput("Day11")
     println(part1(input))
-//    println(part2(input))
-//    check(part1(input) == 0)
-//    check(part2(input) == 0)
+    println(part2(input))
+    check(part1(input) == 1694)
+    check(part2(input) == 346)
 }
-
-data class DumbOctopus(var energy: Int, val position: Int) {
-    fun increase() {
-        energy += 1
-    }
-}
-
