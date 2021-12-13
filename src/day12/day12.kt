@@ -5,55 +5,53 @@ import readInput
 
 fun main() {
 
+    val completedRoutes = mutableListOf<List<Pair<String, String>>>()
 
-    fun detectDoubleSmallCaves(route: String): Boolean {
-        val caves = route.split("-").filter { it.first().isLowerCase() }
-        val groupedSmallCaves = caves.groupingBy { it }.eachCount().filter { it.value > 1 }
-        if (groupedSmallCaves.isNotEmpty()) {
-            return false
-        }
-        return true
-    }
+    fun findRoute(startRoutes: MutableList<List<Pair<String, String>>>, allRoutes: List<Pair<String, String>>) {
+        println("Start Routes: $startRoutes ${startRoutes.size}")
+        var routes = mutableListOf<List<Pair<String, String>>>()
 
-    fun findNextStep(unknownRoutes: List<String>, input: List<String>): List<String> {
-        var completedRoutes = mutableListOf<String>()
-
-        unknownRoutes.map { route ->
-            val lastCave = route.last().toString()
-            val routes = input
-                .asSequence()
-                .filter { it.takeLast(3) != "end" }
-                .filter { it.contains(lastCave) }
-                .filter { it != route }
-                .filter { detectDoubleSmallCaves(route) }
-                .map { if (it.first().toString() != lastCave) it.reversed() else it }
-                .map { it.replace(lastCave, route) }
-                .toList()
-
-            val numberOfOpenRoutes = routes.stream().filter { !it.contains("end") }.toList().size
-
-            if (numberOfOpenRoutes == 0) {
-                completedRoutes.addAll(routes)
-            } else {
-                println(routes)
-                findNextStep(routes, input.filter { !it.contains("start") })
+        startRoutes.forEach { eachRoute ->
+            val nextSteps = allRoutes.filter { it.first == eachRoute.last().second }
+            //println("Next Steps = $nextSteps for ${eachRoute.last().second} in $eachRoute")
+            nextSteps.forEach { newStep ->
+                 //if (eachRoute.filter { it.first == it })
+                routes.add(eachRoute.plus(newStep))
             }
         }
-        return completedRoutes
+
+        routes.forEach {
+            if (it.first().first == "start" && it.last().second == "end") {
+                completedRoutes.add(it)
+            } else {
+                findRoute(routes, allRoutes)
+            }
+        }
+
     }
 
     fun part1(input: List<String>): Int {
-        val startingPoint = input.filter { it.contains("start") }
-        val unknownPaths = input.filter { !it.contains("start") }
-        val left = input.stream().map { it.split("-")[0] }.toList().distinct()
-        val right = input.stream().map { it.split("-")[1] }.toList().distinct()
-        val allCaves = (left + right).distinct()
-        val smallCaves = allCaves.filter { it !in listOf("start", "end") }.filter { it.first().isLowerCase() }
-        val bigCaves = allCaves.filter { it !in listOf("start", "end") }.filter { it.first().isUpperCase() }
+        val startingPoints = input.filter { it.contains("start") }.toSet().also { println("Starting points: $it") }
+        val endPoints = input.filter { it.contains("end") }.toSet().also { println("End points: $it") }
+        val middleRoutes = input.subtract(startingPoints).subtract(endPoints).also { println("Middle paths: $it") }
+        val allCaves = input.stream().map { it.split("-") }.toList().flatten().distinct().toSet().also { println("All Caves: $it") }
+        val smallCaves = allCaves.filter { it !in listOf("start", "end") }.filter { it.first().isLowerCase() }.also { println("Small Caves: $it") }
+        val bigCaves = allCaves.filter { it !in listOf("start", "end") }.filter { it.first().isUpperCase() }.also { println("Big Caves: $it") }
 
-        val routes = findNextStep(startingPoint, input)
+        val normalRoutes = input.map { it.split("-") }.map { Pair(it.first(), it.last()) }.also { println("All Routes: $it") }
+        val reversedRoutes = input.map { it.split("-") }.map { Pair(it.last(), it.first()) }.also { println("All Routes: $it") }
+        val allRoutes = normalRoutes + reversedRoutes
 
-        println(routes)
+        println()
+        println()
+        val startRoutes = allRoutes.filter { it.first == "start" }.map { listOf(it) }.toMutableList()
+
+        findRoute(startRoutes, allRoutes)
+
+        completedRoutes.forEach {
+            println("Complete Route: $it")
+        }
+
         return 0
     }
 
