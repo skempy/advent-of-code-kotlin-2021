@@ -41,24 +41,29 @@ fun main() {
         return remainingBits.subSequence(5, remainingBits.length)
     }
 
+    fun removeNonType4Stuff(bitsWithoutTypeID: CharSequence): CharSequence {
+        val (lengthType, bitsWithoutLengthType) = bitsWithoutTypeID.getLengthType()
+        return when (lengthType) {
+            1 -> {
+                val (totalLength, bitsWithoutTotalLength) = bitsWithoutLengthType.getTotalLengths()
+                bitsWithoutTotalLength
+            }
+            else -> {
+                val (noOfPackets, bitsWithoutNoOfPackets) = bitsWithoutLengthType.getNumberOfPackets()
+                bitsWithoutNoOfPackets
+            }
+        }
+    }
+
     fun part1(input: List<String>): Int {
         var binaryString = input[0].toCharArray().joinToString { it.toHexString() }.replace(", ", "").also { println(it) }
         var versionNoCount = 0
 
         val (versionNo, bitsWithoutVersionNo) = binaryString.getPacketVersion()
         val (typeId, bitsWithoutTypeID) = bitsWithoutVersionNo.getTypeID()
-        
+
         if (typeId != 4) {
-            //Operator
-            val (lengthType, bitsWithoutLengthType) = bitsWithoutTypeID.getLengthType()
-            when (lengthType) {
-                1 -> {
-                    val (totalLength, bitsWithoutTotalLength) = bitsWithoutLengthType.getTotalLengths()
-                }
-                0 -> {
-                    val (noOfPackets, bitsWithoutNoOfPackets) = bitsWithoutLengthType.getNumberOfPackets()
-                }
-            }
+            val remainingBits = removeNonType4Stuff(bitsWithoutTypeID)
         } else {
             val remainingBits = bitsWithoutTypeID.removeLiteralBits()
             println("RemainingBits: $remainingBits")
