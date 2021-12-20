@@ -101,6 +101,7 @@ fun main() {
             tempGrid.add(pixelGrid[Point(lastRow, column)] ?: throw RuntimeException("SUS"))
         }
 
+        if(!tempGrid.contains('.')) throw RuntimeException("No ' ")
         return tempGrid.contains('#')
     }
 
@@ -151,22 +152,22 @@ fun main() {
             pixelGrid.clear()
             pixelGrid.putAll(newPixelGrid)
         }
-        //printGridWithChar(pixelGrid)
+        printGridWithChar(pixelGrid)
         return pixelGrid.values.count { it == '#' }
     }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day20", "_test")
-    println(part1(testInput))
-    check(part1(testInput) == 35)
-    println(part2(testInput))
-    check(part2(testInput) == 3351)
+//    println(part1(testInput))
+//    check(part1(testInput) == 35)
+//    println(part2(testInput))
+//    check(part2(testInput) == 3351)
 
     val input = readInput("Day20")
 //    println(part1(input))
-//    check(part1(input) == 5294)
+//    check(part1(input) == 5483)
 //    //Too High 20330
-//    println(part2(input))
-//    check(part2(input) == 5326)
+    println(part2(input))
+    check(part2(input) == 5326)
 }
 
