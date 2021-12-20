@@ -86,39 +86,58 @@ fun main() {
             }
         }
 
-        var firstPassPixelGrid = mutableMapOf<Point, Char>()
-        var secondPassPixelGrid = mutableMapOf<Point, Char>()
-
         pixelGrid.putAll(padImage(pixelGrid))
 
-        pixelGrid.forEach { (key, value) ->
-            firstPassPixelGrid.putAll(findValuesFor(key, pixelGrid, binaryLookup))
+        repeat((1..2).count()) {
+            var newPixelGrid = mutableMapOf<Point, Char>()
+            pixelGrid.forEach { (key, value) ->
+                newPixelGrid.putAll(findValuesFor(key, pixelGrid, binaryLookup))
+            }
+            pixelGrid.clear()
+            pixelGrid.putAll(newPixelGrid)
         }
-
-        firstPassPixelGrid.forEach { (key, value) ->
-            secondPassPixelGrid.putAll(findValuesFor(key, firstPassPixelGrid, binaryLookup))
-        }
-
-        printGridWithChar(secondPassPixelGrid)
-
-        return secondPassPixelGrid.values.count { it == '#' }
+        //printGridWithChar(pixelGrid)
+        return pixelGrid.values.count { it == '#' }
     }
 
     fun part2(input: List<String>): Int {
-        return 0
+        val binaryLookup = input[0].toList()
+
+        var pixelGrid = mutableMapOf<Point, Char>()
+        val listOfPixels = input.filterIndexed { index, _ -> (index > 1) }.map { it.toCharArray().toList() }
+
+        repeat((listOfPixels.indices).count()) { row ->
+            repeat((listOfPixels[row].indices).count()) { column ->
+                pixelGrid[Point(row + 1, column + 1)] = listOfPixels[row][column]
+            }
+        }
+
+        pixelGrid.putAll(padImage(pixelGrid))
+
+        repeat((1..50).count()) {
+            var newPixelGrid = mutableMapOf<Point, Char>()
+            pixelGrid.forEach { (key, value) ->
+                newPixelGrid.putAll(findValuesFor(key, pixelGrid, binaryLookup))
+            }
+            pixelGrid.clear()
+            pixelGrid.putAll(newPixelGrid)
+        }
+        //printGridWithChar(pixelGrid)
+        return pixelGrid.values.count { it == '#' }
     }
 
     // test if implementation meets criteria from the description, like:
     val testInput = readInput("Day20", "_test")
-//    println(part1(testInput))
+    println(part1(testInput))
     check(part1(testInput) == 35)
-//    println(part2(testInput))
-//    check(part2(testInput) == 0)
+    println(part2(testInput))
+    check(part2(testInput) == 3351)
 
     val input = readInput("Day20")
     println(part1(input))
-//    println(part2(input))
     check(part1(input) == 5483)
+    //Too High 20330
+//    println(part2(input))
 //    check(part2(input) == 0)
 }
 
