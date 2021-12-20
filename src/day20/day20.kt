@@ -18,7 +18,7 @@ fun main() {
         (minXValue(pixels.keys)..maxXValue(pixels.keys)).forEach { row ->
             println()
             (minYValue(pixels.keys)..maxYValue(pixels.keys)).forEach { column ->
-                print("${pixels[Point(row, column)]}")
+                print("${pixels[Point(row, column)] ?: 'O'}")
             }
         }
     }
@@ -50,28 +50,58 @@ fun main() {
         }
 
         val binaryNumber = parseInt(listOfPixelValues.map { if (it == '.') 0 else 1 }.joinToString().replace(", ", ""), 2)
-
         listOfNewPoints[pointOnGrid] = binaryLookup[binaryNumber]
         return listOfNewPoints
     }
 
     fun padImage(pixelGrid: MutableMap<Point, Char>): MutableMap<Point, Char> {
         var paddedPixels = mutableMapOf<Point, Char>()
-        val previousRow = minXValue(pixelGrid.keys) - 1
-        val rowAfterLast = maxXValue(pixelGrid.keys) + 1
-        val previousColumn = minYValue(pixelGrid.keys) - 1
-        val columnAfterLast = maxYValue(pixelGrid.keys) + 1
+        val currentRow = minXValue(pixelGrid.keys)
+        val lastRow = maxXValue(pixelGrid.keys)
+        val currentColumn = minYValue(pixelGrid.keys)
+        val lastColumn = maxYValue(pixelGrid.keys)
 
-        (previousRow..rowAfterLast).forEach { row ->
-            paddedPixels[Point(row, previousColumn)] = '.'
-            paddedPixels[Point(row, columnAfterLast)] = '.'
+        (currentRow - 1 until currentRow).forEach { row ->
+            (currentColumn - 1..lastColumn + 1).forEach { column ->
+                paddedPixels[Point(row, column)] = '.'
+            }
         }
-        (previousColumn..columnAfterLast).forEach { column ->
-            paddedPixels[Point(previousColumn, column)] = '.'
-            paddedPixels[Point(columnAfterLast, column)] = '.'
+        (lastRow + 1..lastRow + 1).forEach { row ->
+            (currentColumn - 1..lastColumn + 1).forEach { column ->
+                paddedPixels[Point(row, column)] = '.'
+            }
         }
-
+        (lastColumn + 1..lastColumn + 1).forEach { column ->
+            (currentRow..lastRow).forEach { row ->
+                paddedPixels[Point(row, column)] = '.'
+            }
+        }
+        (currentColumn - 1..currentColumn - 1).forEach { column ->
+            (currentRow..lastRow).forEach { row ->
+                paddedPixels[Point(row, column)] = '.'
+            }
+        }
         return paddedPixels
+    }
+
+    fun anyLitUpPixelsOnEdge(pixelGrid: MutableMap<Point, Char>): Boolean {
+        var tempGrid = mutableListOf<Char>()
+
+        val firstRow = minXValue(pixelGrid.keys)
+        val lastRow = maxXValue(pixelGrid.keys)
+        val firstColumn = minYValue(pixelGrid.keys)
+        val lastColumn = maxYValue(pixelGrid.keys)
+
+        (firstRow..lastRow).forEach { row ->
+            tempGrid.add(pixelGrid[Point(row, firstColumn)] ?: throw RuntimeException("SUS"))
+            tempGrid.add(pixelGrid[Point(row, lastColumn)] ?: throw RuntimeException("SUS"))
+        }
+        (firstColumn..lastColumn).forEach { column ->
+            tempGrid.add(pixelGrid[Point(firstRow, column)] ?: throw RuntimeException("SUS"))
+            tempGrid.add(pixelGrid[Point(lastRow, column)] ?: throw RuntimeException("SUS"))
+        }
+
+        return tempGrid.contains('#')
     }
 
     fun part1(input: List<String>): Int {
@@ -86,17 +116,17 @@ fun main() {
             }
         }
 
-        pixelGrid.putAll(padImage(pixelGrid))
-
-        repeat((1..2).count()) {
+        repeat((0..1).count()) {
             var newPixelGrid = mutableMapOf<Point, Char>()
+            if (anyLitUpPixelsOnEdge(pixelGrid)) pixelGrid.putAll(padImage(pixelGrid))
             pixelGrid.forEach { (key, value) ->
                 newPixelGrid.putAll(findValuesFor(key, pixelGrid, binaryLookup))
             }
             pixelGrid.clear()
             pixelGrid.putAll(newPixelGrid)
+            printGridWithChar(pixelGrid)
         }
-        //printGridWithChar(pixelGrid)
+        printGridWithChar(pixelGrid)
         return pixelGrid.values.count { it == '#' }
     }
 
@@ -112,10 +142,9 @@ fun main() {
             }
         }
 
-        pixelGrid.putAll(padImage(pixelGrid))
-
         repeat((1..50).count()) {
             var newPixelGrid = mutableMapOf<Point, Char>()
+            if (anyLitUpPixelsOnEdge(pixelGrid)) pixelGrid.putAll(padImage(pixelGrid))
             pixelGrid.forEach { (key, value) ->
                 newPixelGrid.putAll(findValuesFor(key, pixelGrid, binaryLookup))
             }
@@ -134,10 +163,10 @@ fun main() {
     check(part2(testInput) == 3351)
 
     val input = readInput("Day20")
-    println(part1(input))
-    check(part1(input) == 5483)
-    //Too High 20330
+//    println(part1(input))
+//    check(part1(input) == 5294)
+//    //Too High 20330
 //    println(part2(input))
-//    check(part2(input) == 0)
+//    check(part2(input) == 5326)
 }
 
